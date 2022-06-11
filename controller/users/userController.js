@@ -16,13 +16,14 @@ sgMail.setApiKey(process.env.SEND_GRID_API_KEYS);
 const userRegisterCtrl = expressAsyncHandler(async (req,res)=>{
     //check if user exist
     console.log("register");
+    console.log(req.body);
     const userExist = await User.findOne({email : req?.body?.email});
 
     if(userExist) throw new Error("User already exist");
     try{
     const user = await User.create({
-        firstname : req?.body?.firstName,
-        lastname : req?.body?.lastName,
+        firstname : req?.body?.firstname,
+        lastname : req?.body?.lastname,
         email : req?.body?.email,
         password : req?.body?.password
     });
