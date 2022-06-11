@@ -39,13 +39,10 @@ app.use(notFound);
 app.use(errorHandler);
 
 
-const PORT = process.env.PORT || '8080';
-
-app.set('port',PORT);
+const PORT = 3000;
 
 app.listen(PORT,()=>{
     console.log(`Server is running on PORT ${PORT}`);
 })
 
 
-// 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
