@@ -71,7 +71,7 @@ const fetchUser = expressAsyncHandler(async (req,res)=>{
     }catch(err){
         res.json(err);
     }
-    res.json({user : "fetch all user"})
+    // res.json({user : "fetch all user"})
 })
 
 // delete user
