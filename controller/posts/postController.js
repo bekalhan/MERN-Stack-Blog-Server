@@ -12,11 +12,8 @@ const blockUser = require('../utils/isBlock');
 
 // create post
 const createPostCtrl = expressAsyncHandler(async (req,res)=>{
-    console.log("create");
     const {_id} = req.user;
     blockUser(req.user);
-    console.log(req.body);
-    // validateMongodbId(req.body.user);
     const filter = new Filter();
     const isProfane = filter.isProfane(req.body.title,req.body.description);
     //block user
@@ -36,7 +33,6 @@ const createPostCtrl = expressAsyncHandler(async (req,res)=>{
         find_user.postCount = find_user.postCount + 1;
         find_user.save();
         res.json(post);
-        // fs.unlinkSync(image);
     }catch(err){
         res.json(err);
     }
@@ -62,19 +58,15 @@ const fetchAllPosts = expressAsyncHandler(async (req,res)=>{
 
 //fetch a single posts
 const fetchPost = expressAsyncHandler(async (req,res)=>{
-    console.log("fetch al");
     const {id} = req.params;
-    console.log("id",id);
     // validateMongodbId(id);
     try{
         const post = await Post.findById(id).populate("user").populate("disLikes").populate("likes").populate('comments');
         await Post.findByIdAndUpdate(id,{
             $inc : {numViews :1}
         },{new : true})
-        console.log("post",post);
         res.json(post);
     }catch(err){
-        console.log("error");
         res.json(err);
     }
 })
@@ -82,7 +74,6 @@ const fetchPost = expressAsyncHandler(async (req,res)=>{
 
 //update post
 const updatePost = expressAsyncHandler(async (req,res)=>{
-    console.log("update");
     const {id} = req.params;
     // validateMongodbId(id);
     try{
@@ -100,7 +91,6 @@ const updatePost = expressAsyncHandler(async (req,res)=>{
 //delete post
 
 const deletePost = expressAsyncHandler(async (req,res)=>{
-    console.log("delete");
     const {id} = req.params;
     // validateMongodbId(id);
     try{
@@ -114,7 +104,6 @@ const deletePost = expressAsyncHandler(async (req,res)=>{
 // post like
 
 const toggleAddLikeCtrl = expressAsyncHandler(async (req,res)=>{
-    console.log("enter");
     //find post 
     const postId = req.body.postId;
     const post = await Post.findById(postId);
@@ -150,10 +139,8 @@ const toggleAddLikeCtrl = expressAsyncHandler(async (req,res)=>{
 // post dislikes
 
 const toggleDislikeCtrl = expressAsyncHandler(async (req,res)=>{
-    console.log("dislike");
     const postId = req.body.postId;
     const post = await Post.findById(postId);
-    console.log(post);
     //find the user
     const loginUserId = req?.user?._id;
     // check user already dislikes this post
@@ -161,33 +148,27 @@ const toggleDislikeCtrl = expressAsyncHandler(async (req,res)=>{
     //check user already likes this  post
     const alreadyLiked = post?.likes?.find(userId => userId.toString() === loginUserId?.toString())
 
-    console.log("a");
 
     if(alreadyLiked){
-        console.log("already liked");
         const post = await Post.findByIdAndUpdate(postId,{
             $pull : {likes : loginUserId},
             isLiked : false
         },{new : true})
     }
 
-    console.log("b");
 
     if(isDisliked){
-        console.log("is disliked");
         const post = await Post.findByIdAndUpdate(postId,{
             $pull : {disLikes : loginUserId },
             isDisLiked : false
         },{new : true})
     }else{
-        console.log("else");
         const post = await Post.findByIdAndUpdate(postId,{
             $push : {disLikes : loginUserId},
             isDisLiked : true
         },{new : true})
     }
 
-    console.log("c");
 
     res.json(post);
 })

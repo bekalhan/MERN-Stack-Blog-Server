@@ -1,5 +1,5 @@
 const User = require('../../model/user/User');
-const sgMail = require('@sendgrid/mail');
+//const sgMail = require('@sendgrid/mail');
 const fs = require('fs');
 const expressAsyncHandler = require('express-async-handler');
 const generateToken = require('../../config/token/generateToken')
@@ -7,16 +7,13 @@ const validateMongodbId = require('../utils/validateMongodb');
 const cloudinaryUploadImg = require('../utils/cloudinary');
 const crypto = require('crypto');
 
-console.log("key : ",process.env.SEND_GRID_API_KEYS)
 
-sgMail.setApiKey(process.env.SEND_GRID_API_KEYS);
+//sgMail.setApiKey(process.env.SEND_GRID_API_KEYS);
 
 // User register
 
 const userRegisterCtrl = expressAsyncHandler(async (req,res)=>{
     //check if user exist
-    console.log("register");
-    console.log(req.body);
     const userExist = await User.findOne({email : req?.body?.email});
 
     if(userExist) throw new Error("User already exist");
@@ -27,7 +24,6 @@ const userRegisterCtrl = expressAsyncHandler(async (req,res)=>{
         email : req?.body?.email,
         password : req?.body?.password
     });
-    console.log(user);
     res.json(user);
     }catch(err){
         res.json(err);
@@ -58,7 +54,7 @@ const userLoginCtrl = expressAsyncHandler(async (req,res)=>{
 
     }
 }catch(err){
-    res.json(err);
+    return new Error("Invalid credentials");
 }
 })
 
@@ -78,7 +74,7 @@ const fetchUser = expressAsyncHandler(async (req,res)=>{
 
 const deleteUserCtrl = expressAsyncHandler(async (req,res)=>{
     const {id} = req.params;
-    validateMongodbId(id);
+    //validateMongodbId(id);
     try{
         const deleteduser = await User.findByIdAndDelete(id);
         res.json(deleteduser);
@@ -91,7 +87,7 @@ const deleteUserCtrl = expressAsyncHandler(async (req,res)=>{
 
 const fetchUserDetailsCtrl = expressAsyncHandler(async (req,res)=>{
     const {id} = req.params;
-    validateMongodbId(id);
+    //validateMongodbId(id);
 
     try{
         const user = await User.findById(id);
@@ -105,9 +101,8 @@ const fetchUserDetailsCtrl = expressAsyncHandler(async (req,res)=>{
 // user profile
 
 const userProfileCtrl = expressAsyncHandler(async (req,res)=>{
-    console.log("profile ctrl");
     const {id} = req.params;
-    validateMongodbId(id);
+//    validateMongodbId(id);
 
     // const loginUserId = req.user.id;
 
@@ -125,10 +120,8 @@ const userProfileCtrl = expressAsyncHandler(async (req,res)=>{
         //     })
         //     res.json("Not Viewed");
         // }
-        console.log(myprofile);
         res.json(myprofile)
     }catch(err){
-        console.log("error");
         res.json(err);
     }
 })
@@ -136,9 +129,9 @@ const userProfileCtrl = expressAsyncHandler(async (req,res)=>{
 //update profile
 
 const userProfileUpdateCtrl = expressAsyncHandler(async (req,res)=>{
-    console.log("profile update");
+    console.log("update user");
     const {_id} = req.user;
-    validateMongodbId(_id);
+//    validateMongodbId(_id);
 
     const user = await User.findByIdAndUpdate(_id,{
         firstname : req?.body?.firstname,
@@ -154,10 +147,9 @@ const userProfileUpdateCtrl = expressAsyncHandler(async (req,res)=>{
 
 //update password
 const userUpdatePasswordCtrl = expressAsyncHandler(async (req,res)=>{
-    console.log("update password");
     const {_id} = req.user;
     const {password} = req.body;
-    validateMongodbId(_id);
+   //validateMongodbId(_id);
     const user = await User.findById(_id);
     if(password){
         user.password = password;
@@ -170,7 +162,6 @@ const userUpdatePasswordCtrl = expressAsyncHandler(async (req,res)=>{
 
 // user following
 const followingUserCtrl = expressAsyncHandler(async (req,res)=>{
-    console.log("follow user")
     const {followId} = req.body;
     const loginUserId = req.user.id;
 
@@ -216,9 +207,8 @@ const unfollowingUserCtrl = expressAsyncHandler(async (req,res)=>{
 
 //blocked user
 const blockUserCtrl = expressAsyncHandler(async (req,res)=>{
-    console.log("block user id : "+req.params.id);
     const id = req.params.id;
-    validateMongodbId(id);
+   // validateMongodbId(id);
 
     const user = await User.findByIdAndUpdate(id,{
         isBlocked:true
@@ -230,7 +220,7 @@ const blockUserCtrl = expressAsyncHandler(async (req,res)=>{
 //unblock user
 const unblockUserCtrl = expressAsyncHandler(async (req,res)=>{
     const id = req.params.id;
-    validateMongodbId(id);
+   // validateMongodbId(id);
 
     const user = await User.findByIdAndUpdate(id,{
         isBlocked:false
@@ -242,8 +232,7 @@ const unblockUserCtrl = expressAsyncHandler(async (req,res)=>{
 
 // geenerate verification token -- send email
 
-const generateVerificationTokenCtrl = expressAsyncHandler(async (req,res)=>{
-    console.log("verfication token");
+/*const generateVerificationTokenCtrl = expressAsyncHandler(async (req,res)=>{
     const loginUserId = req.user.id;
     const user = await User.findById(loginUserId);
     console.log("user : ",user);
@@ -267,7 +256,7 @@ const generateVerificationTokenCtrl = expressAsyncHandler(async (req,res)=>{
     }catch(err){
         res.json("error"+err);
     }
-})
+}) */
 
 
 //Account verification
@@ -290,7 +279,7 @@ const accountVerificationCtrl = expressAsyncHandler(async (req,res)=>{
 
 // forget token 
 
-const forgetPasswordToken = expressAsyncHandler(async (req,res)=>{
+/*const forgetPasswordToken = expressAsyncHandler(async (req,res)=>{
 
     const {email} = req.body;
     const user = await User.findOne({email});
@@ -315,7 +304,7 @@ const forgetPasswordToken = expressAsyncHandler(async (req,res)=>{
         res.json(emailMsg);
     }catch(err){}
 
-});
+}); */
 
 // password reset
 
@@ -338,7 +327,6 @@ const passwordResetCtrl = expressAsyncHandler(async (req,res)=>{
 // profile photo upload
 
 const profilePhotoUploadCtrl = expressAsyncHandler(async (req,res)=>{
-    console.log("profile");
     const {_id} = req.user;
     const localpath = `public/images/profile/${req.file.filename}`;
     const imageUploaded = await cloudinaryUploadImg(localpath);
@@ -354,6 +342,6 @@ const profilePhotoUploadCtrl = expressAsyncHandler(async (req,res)=>{
 
 module.exports = {userRegisterCtrl,userLoginCtrl,fetchUser,deleteUserCtrl,
     fetchUserDetailsCtrl,userProfileCtrl,userProfileUpdateCtrl,userUpdatePasswordCtrl,
-    followingUserCtrl,unfollowingUserCtrl,blockUserCtrl,unblockUserCtrl,generateVerificationTokenCtrl,
-    accountVerificationCtrl,forgetPasswordToken,passwordResetCtrl,profilePhotoUploadCtrl
+    followingUserCtrl,unfollowingUserCtrl,blockUserCtrl,unblockUserCtrl,
+    accountVerificationCtrl,passwordResetCtrl,profilePhotoUploadCtrl
 }

@@ -4,7 +4,6 @@ const Category = require('../../model/Category/Category');
 
 // create category
 const createCategoryCtrl = expressAsyncHandler(async (req,res)=>{
-    console.log("category create");
     try{
         const category = await Category.create({
             user : req?.user?._id,
