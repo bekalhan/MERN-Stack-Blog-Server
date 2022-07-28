@@ -54,7 +54,7 @@ const userLoginCtrl = expressAsyncHandler(async (req,res)=>{
 
     }
 }catch(err){
-    return new Error("Invalid credentials");
+     throw new Error("Invalid credentials");
 }
 })
 
@@ -129,11 +129,11 @@ const userProfileCtrl = expressAsyncHandler(async (req,res)=>{
 //update profile
 
 const userProfileUpdateCtrl = expressAsyncHandler(async (req,res)=>{
-    console.log("update user");
+    console.log("update user",req.user);
     const {_id} = req.user;
-//    validateMongodbId(_id);
+    const user_id = _id.toString();
 
-    const user = await User.findByIdAndUpdate(_id,{
+    const user = await User.findByIdAndUpdate(user_id,{
         firstname : req?.body?.firstname,
         lastname : req?.body?.lastname,
         email : req?.body?.email,

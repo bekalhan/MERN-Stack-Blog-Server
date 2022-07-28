@@ -3,8 +3,6 @@ const {createPostCtrl,fetchAllPosts,fetchPost,updatePost,deletePost,toggleAddLik
 const authmiddleware = require('../../middlewares/auth/authMiddleWare');
 const {postPhotoResize,PhotoUpload} = require('../../middlewares/uploads/profilePhotoUpload');
 
-console.log("girdi");
-
 const postRoute = express.Router();
 
 //post request
